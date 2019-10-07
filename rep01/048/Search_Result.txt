@@ -22,6 +22,9 @@ CLOSED:[L.A.Airport(h:0)(g:0), UCLA(h:7)(g:1), Hoolywood(h:4)(g:2), Pasadena(h:4
 Las Vegas(h:0)(g:11) <- DisneyLand(h:2)(g:6) <- Pasadena(h:4)(g:5) <- Hoolywood(h:4)(g:2) <- UCLA(h:7)(g:1) <- L.A.Airport(h:0)(g:0)
 COST:11
 
+Hill Climbing Search
+COST:--
+
 Best First Search
 STEP:5
 OPEN:[Las Vegas(h:0), DisneyLand(h:2), Anaheim(h:6), UCLA(h:7)]
