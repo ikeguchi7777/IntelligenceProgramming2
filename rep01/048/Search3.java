@@ -1,48 +1,27 @@
-import java.util.*;
+import java.util.ArrayList;
 
-public class Search {
+public class Search3 {
 	Node[] node;
 	Node goal;
 	Node start;
 
-	Search() {
+	Search3() {
 		makeStateSpace();
 	}
 
 	private void makeStateSpace() {
-		node = new Node[10];
+		node = new Node[4];
 		// 状態空間の生成
-		node[0] = new Node("L.A.Airport", 0);
-		node[1] = new Node("UCLA", 7);
-		node[2] = new Node("Hoolywood", 4);
-		node[3] = new Node("Anaheim", 6);
-		node[4] = new Node("GrandCanyon", 1);
-		node[5] = new Node("SanDiego", 2);
-		node[6] = new Node("Downtown", 3);
-		node[7] = new Node("Pasadena", 4);
-		node[8] = new Node("DisneyLand", 2);
-		node[9] = new Node("Las Vegas", 0);
+		node[0] = new Node("Start", 0);
+		node[1] = new Node("Goal", 0);
+		node[2] = new Node("Good", 3);
+		node[3] = new BadNode("Bad", 1);
 		start = node[0];
-		goal = node[9];
+		goal = node[1];
 
-		node[0].addChild(node[1], 1);
-		node[0].addChild(node[2], 3);
-		node[1].addChild(node[2], 1);
-		node[1].addChild(node[6], 6);
-		node[2].addChild(node[3], 6);
-		node[2].addChild(node[6], 6);
-		node[2].addChild(node[7], 3);
-		node[3].addChild(node[4], 5);
-		node[3].addChild(node[7], 2);
-		node[3].addChild(node[8], 4);
-		node[4].addChild(node[8], 2);
-		node[4].addChild(node[9], 1);
-		node[5].addChild(node[1], 1);
-		node[6].addChild(node[5], 7);
-		node[6].addChild(node[7], 2);
-		node[7].addChild(node[8], 1);
-		node[7].addChild(node[9], 7);
-		node[8].addChild(node[9], 5);
+		node[0].addChild(node[3], 1);
+		node[0].addChild(node[2], 1);
+		node[2].addChild(node[1], 4);
 	}
 
 	/***
@@ -492,32 +471,32 @@ public class Search {
 			case 1:
 				// 幅優先探索
 				System.out.println("\nBreadth First Search");
-				(new Search()).breadthFirst();
+				(new Search3()).breadthFirst();
 				break;
 			case 2:
 				// 深さ優先探索
 				System.out.println("\nDepth First Search");
-				(new Search()).depthFirst();
+				(new Search3()).depthFirst();
 				break;
 			case 3:
 				// 分岐限定法
 				System.out.println("\nBranch and Bound Search");
-				(new Search()).branchAndBound();
+				(new Search3()).branchAndBound();
 				break;
 			case 4:
 				// 山登り法
 				System.out.println("\nHill Climbing Search");
-				(new Search()).hillClimbing();
+				(new Search3()).hillClimbing();
 				break;
 			case 5:
 				// 最良優先探索
 				System.out.println("\nBest First Search");
-				(new Search()).bestFirst();
+				(new Search3()).bestFirst();
 				break;
 			case 6:
 				// A*アルゴリズム
 				System.out.println("\nA star Algorithm");
-				(new Search()).aStar();
+				(new Search3()).aStar();
 				break;
 			default:
 				System.out.println("Please input numbers 1 to 6");
@@ -526,83 +505,18 @@ public class Search {
 	}
 }
 
-class Node {
-	String name;
-	ArrayList<Node> children;
-	HashMap<Node,Integer> childrenCosts;
-	Node pointer; // 解表示のためのポインタ
-	int gValue; // コスト
-	int hValue; // ヒューリスティック値
-	int fValue; // 評価値
-	boolean hasGValue = false;
-	boolean hasFValue = false;
+class BadNode extends Node {
 
-	Node(String theName, int theHValue) {
-		name = theName;
-		children = new ArrayList<Node>();
-		childrenCosts = new HashMap<Node,Integer>();
-		hValue = theHValue;
+	static int id = 0;
+	BadNode(String theName, int theHValue) {
+		super(theName, theHValue);
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setPointer(Node theNode) {
-		this.pointer = theNode;
-	}
-
-	public Node getPointer() {
-		return this.pointer;
-	}
-
-	public int getGValue() {
-		return gValue;
-	}
-
-	public void setGValue(int theGValue) {
-		hasGValue = true;
-		this.gValue = theGValue;
-	}
-
-	public int getHValue() {
-		return hValue;
-	}
-
-	public int getFValue() {
-		return fValue;
-	}
-
-	public void setFValue(int theFValue) {
-		hasFValue = true;
-		this.fValue = theFValue;
-	}
-
-	
-	/***
-	 * theChild この節点の子節点 theCost その子節点までのコスト
-	 */
-	public void addChild(Node theChild, int theCost) {
-		children.add(theChild);
-		childrenCosts.put(theChild, new Integer(theCost));
-	}
-
+	@Override
 	public ArrayList<Node> getChildren() {
-		return children;
+		addChild(new BadNode("Bad" + id++, hValue), 1);
+		return super.getChildren();
 	}
-
-	public int getCost(Node theChild) {
-		return childrenCosts.get(theChild).intValue();
-	}
-
-	public String toString() {
-		String result = name + "(h:" + hValue + ")";
-		if (hasGValue) {
-			result = result + "(g:" + gValue + ")";
-		}
-		if (hasFValue) {
-			result = result + "(f:" + fValue + ")";
-		}
-		return result;
-	}
+	
+	
 }
