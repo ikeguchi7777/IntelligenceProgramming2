@@ -1,9 +1,13 @@
-import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public class Search {
+public class Search implements ActionListener {
 	Node[] node;
 	Node goal;
 	Node start;
+	Thread th;
 
 	Search() {
 		makeStateSpace();
@@ -48,7 +52,16 @@ public class Search {
 	/***
 	 * 幅優先探索
 	 */
-	public void breadthFirst() {
+	synchronized public void breadthFirst() {
+		try {
+			System.out.println("待機");
+			wait();
+			System.out.println("解除");
+		} catch (InterruptedException e) {
+			// TODO 自動生成された catch ブロック
+			e.printStackTrace();
+		}
+		System.out.println("aa");
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		ArrayList<Node> closed = new ArrayList<Node>();
@@ -401,8 +414,6 @@ public class Search {
 		}
 	}
 
-	
-	
 	/***
 	 * 解の表示
 	 */
@@ -435,7 +446,6 @@ public class Search {
 		return newOpen;
 	}
 
-	
 	/***
 	 * ArrayList を Node の gValue の昇順（小さい順）に列べ換える．
 	 */
@@ -476,8 +486,108 @@ public class Search {
 		return newOpen;
 	}
 
+	public void actionPerformed(ActionEvent e) {
+		String cmd = e.getActionCommand();
+
+
+		switch (cmd) {
+		case "Bredth First Search":
+			// 幅優先探索
+			System.out.println("\nBreadth First Search");
+			th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					breadthFirst();
+				}
+			});
+			break;
+		case "Depth  First Search":
+			// 深さ優先探索
+			System.out.println("\nDepth First Search");
+			th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					depthFirst();
+				}
+			});
+			break;
+		case "Branch and Bound Search":
+			// 分岐限定法
+			System.out.println("\nBranch and Bound Search");
+			th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					branchAndBound();
+				}
+			});
+			break;
+		case "Hill Climbing Search":
+			// 山登り法
+			System.out.println("\nHill Climbing Search");
+			th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					hillClimbing();
+				}
+			});
+			break;
+		case "Best First Search":
+			// 最良優先探索
+			System.out.println("\nBest First Search");
+			th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					bestFirst();
+				}
+			});
+			break;
+		case "A star Algorithm":
+			// A*アルゴリズム
+			System.out.println("\nA star Algorithm");
+			th = new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					aStar();
+				}
+			});
+			break;
+		default:
+			System.out.println("存在しない探索");
+			return;
+		}
+		ActionListener listener = new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				synchronized (th){
+					th.notifyAll();
+					System.out.println(th.getState());
+				}
+			}
+		};
+		MakeGUI.MakeSearchGUI(listener);
+		th.start();
+
+	}
+
 	public static void main(String[] args) {
-		if (args.length != 1) {
+		Search search = new Search();
+		String[] searchNames = {
+				"Bredth First Search",
+				"Depth  First Search",
+				"Branch and Bound Search",
+				"Hill Climbing Search",
+				"Best First Search",
+				"A star Algorithm" };
+		MakeGUI.MakeChooseSearchGUI(search, searchNames);
+
+		/*if (args.length != 1) {
 			System.out.println("USAGE:");
 			System.out.println("java Search [Number]");
 			System.out.println("[Number] = 1 : Bredth First Search");
@@ -522,14 +632,15 @@ public class Search {
 			default:
 				System.out.println("Please input numbers 1 to 6");
 			}
-		}
+		}*/
 	}
+
 }
 
 class Node {
 	String name;
 	ArrayList<Node> children;
-	HashMap<Node,Integer> childrenCosts;
+	HashMap<Node, Integer> childrenCosts;
 	Node pointer; // 解表示のためのポインタ
 	int gValue; // コスト
 	int hValue; // ヒューリスティック値
@@ -540,7 +651,7 @@ class Node {
 	Node(String theName, int theHValue) {
 		name = theName;
 		children = new ArrayList<Node>();
-		childrenCosts = new HashMap<Node,Integer>();
+		childrenCosts = new HashMap<Node, Integer>();
 		hValue = theHValue;
 	}
 
@@ -578,7 +689,6 @@ class Node {
 		this.fValue = theFValue;
 	}
 
-	
 	/***
 	 * theChild この節点の子節点 theCost その子節点までのコスト
 	 */
