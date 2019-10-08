@@ -1,0 +1,172 @@
+\documentclass{jarticle}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{listings,jlisting}
+\usepackage{ascmac}
+\usepackage{amsmath,amssymb}
+
+%ここからソースコードの表示に関する設定
+\lstset{
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\smallitshape},
+  keywordstyle={\small\bfseries},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex
+}
+%ここまでソースコードの表示に関する設定
+
+\title{知能プログラミング演習II 課題1}
+\author{グループ7\\
+  29114031 大原 拓人\\
+%  {\small (グループレポートの場合は、グループ名および全員の学生番号と氏名が必要)}
+}
+\date{2019年10月7日}
+
+\begin{document}
+\maketitle
+
+\paragraph{提出物} rep1
+\paragraph{グループ} グループ7
+\paragraph{メンバー}
+\begin{tabular}{|c|c|c|}
+  \hline
+  学生番号&氏名&貢献度比率\\
+  \hline\hline
+  29114007&池口弘尚&100\\
+  \hline
+  29114031&大原拓人&100\\
+  \hline
+  29114048&北原太一&100\\
+  \hline
+  29114086&飛世裕貴&100\\
+  \hline
+  29114095&野竹浩二朗&100\\
+\end{tabular}
+
+\section{課題の説明}
+\begin{description}
+\item[課題0-1] N番目のフィボナッチ数をもとめるプログラムを実装せよ．
+\item[課題0-2] 自然界に現れるフィボナッチ数列の例を示し，なぜそれがフィボナッチ数列になるのかという原理を考察せよ．
+\end{description}
+
+
+\section{課題1-1}
+\begin{screen}
+  Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\end{screen}
+
+私の担当箇所は、後述する探索手法のうちの幅優先探索である。
+\subsection{手法}
+課題で与えられた探索手法と、我々が改良を加えた点は以下のとおりである。
+
+\begin{enumerate}
+\item 幅優先探索法
+\item 深さ優先探索法
+\item 分枝限定法
+\item 山登り法
+\item 最良優先探索法
+\item A*アルゴリズム
+\end{enumerate}
+
+幅優先探索法に関して、ノードを展開してオープンリストに加える前に
+
+2.に関しては、整数Nが与えられた時、0番目からN番目までのフィボナッチ数列を配列として返す仕様とした。
+
+3.に関しては、・・・
+\subsection{実装}
+
+まず、プログラムに含まれるクラスは以下の1つ。
+\begin{itemize}
+\item Fibonacciクラス: メソッドcalcFibo, isFibo, calcFiboSeq, calcFiboGeneral を実装したクラス．Fibonacci.java に含まれる。
+\end{itemize}
+
+n番目のフィボナッチ数を計算するcalcFiboメソッドの実装をソースコードに示す。
+
+\begin{lstlisting}[caption=calcFiboメソッド,label=src:calcFibo]
+    // n番目のフィボナッチ数を計算して返す
+    int calcFibo(int n) {
+	if (n <= 1) {
+	    return 1;
+	}
+	return calcFibo(n - 1) + calcFibo(n - 2);
+    }
+\end{lstlisting}
+
+isFiboメソッドおよびcalcFiboSeqの実装については、グループレポートを参考にされたい。
+
+calcFiboメソッドに渡す引数nをプログラム実行時に指定できるようにするため、mainメソッドおよびFibonacciクラスのコンストラクタを以下のように実装した。
+\begin{lstlisting}[caption=mainメソッドとコンストラクタ,label=src:main]
+    public static void main(String[] args) {
+	new Fibonacci(Integer.parseInt(args[0]));
+    }
+
+    public Fibonacci(int n) {
+	System.out.println(calcFibo(n));
+    }
+\end{lstlisting}
+
+\subsection{実行例}
+Fibonacciクラスに引数5を指定した実行結果を以下に示す。
+
+\begin{lstlisting}
+clf1XXXX@cse:~/eclipse-workspace/Fibo > java Fibonacci 5
+8
+\end{lstlisting}
+
+今回は0, 1番目のフィボナッチ数を1としたため、calcFibo() の引数に5を与えた時は8となるのが正しい動作である。これは、・・・
+\subsection{考察}
+今回、フィボナッチ数をもとめるためのクラス Fibonacci を実装し、インスタンスメソッドとして機能を実装したが、これは静的クラスまたはシングルトンとして実装した方が適していたように考えられる。なぜなら・・・
+
+また、calcFiboメソッドを再帰関数として実装するのではなく、イテレータを用いて実装した場合を考える。イテレータで実装した場合は、実行速度が・・・
+
+
+\section{課題1-2}
+\begin{screen}
+  グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\end{screen}
+
+課題1-2は実装を伴わない課題であるため、考察のみ記す。
+
+\subsection{考察}
+  今回は課題の分量が少なかったので、演習時間内に終わらなかった分は後日全員で集まって課題を進めた。
+  連絡手段としてLINEを用いた。今後の予定としては、
+%文献\cite{kijima2012}によると、ひまわりの種の並び方にフィボナッチ数列が隠れているという。具体的には、・・・。その原理は、・・・であると考えられる。何故なら、%図\ref{fig:himawari} \cite{notty} に示すように、・・・
+
+%\begin{figure}[!hbt]
+%  \centering
+%  \includegraphics[bb=0 0 543 245,width=0.6\linewidth]{himawari.png}
+%  \caption{ひまわりの種の並び方\cite{notty}}
+%  \label{fig:himawari}
+%\end{figure}
+
+
+\section{感想}
+フィボナッチ数の一般項をもとめるのに夢中であやうく実装が間に合わなくなるところだった。実装に関しては、・・・
+
+
+% 参考文献
+\begin{thebibliography}{99}
+%\bibitem{kijima2012} 来嶋大二: ひまわりの螺旋, 数学のかんどころシリーズ 8, 共立出版, 2012.
+%\bibitem{notty} ひまわりに隠されたフィボナッチ数列と黄金比---ひまわりは黄金の花？, 数学の面白いこと・役に立つことをまとめたサイト, \url{https://analytics-notty.tech/fibonacci-and-goldenratio-in-sunflower/} （2019年10月4日アクセス）.
+
+\bibitem{hanako} 工大花子さんのレポート。また、・・・を教えてもらった 
+
+\end{thebibliography}
+
+\end{document}
