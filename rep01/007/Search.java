@@ -3,11 +3,15 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Search implements ActionListener {
+public class Search implements Runnable {
 	Node[] node;
 	Node goal;
 	Node start;
-	Thread th;
+
+	GraphPanel gPanel;
+
+	int type;
+	boolean isStop = true;
 
 	Search() {
 		makeStateSpace();
@@ -53,25 +57,25 @@ public class Search implements ActionListener {
 	 * 幅優先探索
 	 */
 	synchronized public void breadthFirst() {
-		try {
-			System.out.println("待機");
-			wait();
-			System.out.println("解除");
-		} catch (InterruptedException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-		System.out.println("aa");
+		gPanel.makeTreeList(start);
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
-
 		for (;;) {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
+			gPanel.ChangeStep(step);
+			if (isStop) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -83,17 +87,21 @@ public class Search implements ActionListener {
 				// node は ゴールか？
 				if (node == goal) {
 					success = true;
+					gPanel.addGoal(node);
 					break;
 				} else {
 					// node を展開して子節点をすべて求める．
 					ArrayList<Node> children = node.getChildren();
 					// node を closed に入れる．
 					closed.add(node);
+					boolean isleaf = true;
 					// 子節点 m が open にも closed にも含まれていなければ，
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						if (!open.contains(m) && !closed.contains(m)) {
 							// m から node へのポインタを付ける．
+							isleaf = false;
+							gPanel.addTreeList(node, m);
 							m.setPointer(node);
 							if (m == goal) {
 								open.add(0, m);
@@ -102,6 +110,8 @@ public class Search implements ActionListener {
 							}
 						}
 					}
+					if (isleaf)
+						gPanel.addLeaf(node);
 				}
 			}
 		}
@@ -114,7 +124,8 @@ public class Search implements ActionListener {
 	/***
 	 * 深さ優先探索
 	 */
-	public void depthFirst() {
+	synchronized public void depthFirst() {
+		gPanel.makeTreeList(start);
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		ArrayList<Node> closed = new ArrayList<Node>();
@@ -125,6 +136,15 @@ public class Search implements ActionListener {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
+			gPanel.ChangeStep(step);
+			if (isStop) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -136,6 +156,7 @@ public class Search implements ActionListener {
 				// node は ゴールか？
 				if (node == goal) {
 					success = true;
+					gPanel.addGoal(node);
 					break;
 				} else {
 					// node を展開して子節点をすべて求める．
@@ -148,10 +169,13 @@ public class Search implements ActionListener {
 					// を調整する変数であり，一般には展開したときの子節点
 					// の位置は任意でかまわない．
 					int j = 0;
+					boolean isleaf = true;
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						if (!open.contains(m) && !closed.contains(m)) {
 							// m から node へのポインタを付ける
+							isleaf=false;
+							gPanel.addTreeList(node, m);
 							m.setPointer(node);
 							if (m == goal) {
 								open.add(0, m);
@@ -161,6 +185,8 @@ public class Search implements ActionListener {
 							j++;
 						}
 					}
+					if(isleaf)
+						gPanel.addLeaf(node);
 				}
 			}
 		}
@@ -173,10 +199,11 @@ public class Search implements ActionListener {
 	/***
 	 * 分岐限定法
 	 */
-	public void branchAndBound() {
+	synchronized public void branchAndBound() {
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		start.setGValue(0);
+		gPanel.makeTreeList(start);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
@@ -185,6 +212,15 @@ public class Search implements ActionListener {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
+			gPanel.ChangeStep(step);
+			if (isStop) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -196,23 +232,27 @@ public class Search implements ActionListener {
 				// node は ゴールか？
 				if (node == goal) {
 					success = true;
+					gPanel.addGoal(node);
 					break;
 				} else {
 					// node を展開して子節点をすべて求める．
 					ArrayList<Node> children = node.getChildren();
 					// node を closed に入れる．
 					closed.add(node);
+					boolean isleaf = true;
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						// 子節点mがopenにもclosedにも含まれていなければ，
 						if (!open.contains(m) && !closed.contains(m)) {
 							// m から node へのポインタを付ける．
+							isleaf=false;
 							m.setPointer(node);
 							// nodeまでの評価値とnode->mのコストを
 							// 足したものをmの評価値とする
 							int gmn = node.getGValue() + node.getCost(m);
 							m.setGValue(gmn);
 							open.add(m);
+							gPanel.addTreeList(node, m);
 						}
 						// 子節点mがopenに含まれているならば，
 						if (open.contains(m)) {
@@ -220,9 +260,14 @@ public class Search implements ActionListener {
 							if (gmn < m.getGValue()) {
 								m.setGValue(gmn);
 								m.setPointer(node);
+								gPanel.removeNodeFromTree(m);
+								gPanel.addTreeList(node, m);
+								isleaf=false;
 							}
 						}
 					}
+					if(isleaf)
+						gPanel.addLeaf(node);
 				}
 			}
 			open = sortUpperByGValue(open);
@@ -236,16 +281,27 @@ public class Search implements ActionListener {
 	/***
 	 * 山登り法
 	 */
-	public void hillClimbing() {
+	synchronized public void hillClimbing() {
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		start.setGValue(0);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
-
+		int step = 0;
 		// Start を node とする．
 		Node node = start;
 		for (;;) {
+			if (isStop) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
+			step++;
+			gPanel.ChangeStep(step);
+			gPanel.makeLocalGraph(node);
 			// node は ゴールか？
 			if (node == goal) {
 				success = true;
@@ -275,6 +331,7 @@ public class Search implements ActionListener {
 				if (goalp) {
 					node = goal;
 				} else {
+					gPanel.makeArrow(node, min);
 					node = min;
 				}
 			}
@@ -288,10 +345,11 @@ public class Search implements ActionListener {
 	/***
 	 * 最良優先探索
 	 */
-	public void bestFirst() {
+	synchronized public void bestFirst() {
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		start.setGValue(0);
+		gPanel.makeTreeList(start);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
@@ -300,6 +358,15 @@ public class Search implements ActionListener {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
+			gPanel.ChangeStep(step);
+			if (isStop) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -311,12 +378,14 @@ public class Search implements ActionListener {
 				// node は ゴールか？
 				if (node == goal) {
 					success = true;
+					gPanel.addGoal(node);
 					break;
 				} else {
 					// node を展開して子節点をすべて求める．
 					ArrayList<Node> children = node.getChildren();
 					// node を closed に入れる．
 					closed.add(node);
+					boolean isleaf = true;
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						// 子節点mがopenにもclosedにも含まれていなければ，
@@ -324,8 +393,12 @@ public class Search implements ActionListener {
 							// m から node へのポインタを付ける．
 							m.setPointer(node);
 							open.add(m);
+							isleaf=false;
+							gPanel.addTreeList(node, m);
 						}
 					}
+					if(isleaf)
+						gPanel.addLeaf(node);
 				}
 			}
 			open = sortUpperByHValue(open);
@@ -339,11 +412,12 @@ public class Search implements ActionListener {
 	/***
 	 * A* アルゴリズム
 	 */
-	public void aStar() {
+	synchronized public void aStar() {
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
 		start.setGValue(0);
 		start.setFValue(0);
+		gPanel.makeTreeList(start);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
@@ -352,6 +426,15 @@ public class Search implements ActionListener {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
+			gPanel.ChangeStep(step);
+			if (isStop) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO 自動生成された catch ブロック
+					e.printStackTrace();
+				}
+			}
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -363,12 +446,14 @@ public class Search implements ActionListener {
 				// node は ゴールか？
 				if (node == goal) {
 					success = true;
+					gPanel.addGoal(node);
 					break;
 				} else {
 					// node を展開して子節点をすべて求める．
 					ArrayList<Node> children = node.getChildren();
 					// node を closed に入れる．
 					closed.add(node);
+					boolean isleaf = true;
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						int gmn = node.getGValue() + node.getCost(m);
@@ -383,6 +468,8 @@ public class Search implements ActionListener {
 							m.setPointer(node);
 							// mをopenに追加
 							open.add(m);
+							isleaf=false;
+							gPanel.addTreeList(node, m);
 						} else if (open.contains(m)) {
 							// 子節点mがopenに含まれている場合
 							if (gmn < m.getGValue()) {
@@ -390,6 +477,9 @@ public class Search implements ActionListener {
 								m.setGValue(gmn);
 								m.setFValue(fmn);
 								m.setPointer(node);
+								isleaf=false;
+								gPanel.removeNodeFromTree(m);
+								gPanel.addTreeList(node, m);
 							}
 						} else if (closed.contains(m)) {
 							if (gmn < m.getGValue()) {
@@ -401,6 +491,9 @@ public class Search implements ActionListener {
 								// 子節点mをclosedからopenに移動
 								closed.remove(m);
 								open.add(m);
+								isleaf=false;
+								gPanel.removeNodeFromTree(m);
+								gPanel.addTreeList(node, m);
 							}
 						}
 					}
@@ -419,8 +512,11 @@ public class Search implements ActionListener {
 	 */
 	public void printSolution(Node theNode) {
 		if (theNode == start) {
+			gPanel.msg+=theNode.toString();
 			System.out.println(theNode.toString());
+			gPanel.ShowDialog();
 		} else {
+			gPanel.msg+=theNode.toString() + " <- ";
 			System.out.print(theNode.toString() + " <- ");
 			printSolution(theNode.getPointer());
 		}
@@ -486,98 +582,80 @@ public class Search implements ActionListener {
 		return newOpen;
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		String cmd = e.getActionCommand();
-
+	public static void actionByCommand(String cmd) {
+		Thread th;
+		Search sh = new Search();
 
 		switch (cmd) {
 		case "Bredth First Search":
 			// 幅優先探索
 			System.out.println("\nBreadth First Search");
-			th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					breadthFirst();
-				}
-			});
+			sh.type = 1;
 			break;
 		case "Depth  First Search":
 			// 深さ優先探索
 			System.out.println("\nDepth First Search");
-			th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					depthFirst();
-				}
-			});
+			sh.type = 2;
 			break;
 		case "Branch and Bound Search":
 			// 分岐限定法
 			System.out.println("\nBranch and Bound Search");
-			th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					branchAndBound();
-				}
-			});
+			sh.type = 3;
 			break;
 		case "Hill Climbing Search":
 			// 山登り法
 			System.out.println("\nHill Climbing Search");
-			th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					hillClimbing();
-				}
-			});
+			sh.type = 4;
 			break;
 		case "Best First Search":
 			// 最良優先探索
 			System.out.println("\nBest First Search");
-			th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					bestFirst();
-				}
-			});
+			sh.type = 5;
 			break;
 		case "A star Algorithm":
 			// A*アルゴリズム
 			System.out.println("\nA star Algorithm");
-			th = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					aStar();
-				}
-			});
+			sh.type = 6;
 			break;
 		default:
 			System.out.println("存在しない探索");
 			return;
 		}
+		th = new Thread(sh);
 		ActionListener listener = new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				synchronized (th){
-					th.notifyAll();
-					System.out.println(th.getState());
+				String cmd1 = e.getActionCommand();
+				switch (cmd1) {
+				case "close":
+					System.exit(0);
+					break;
+				case "step":
+					synchronized (sh) {
+						sh.notifyAll();
+						System.out.println(th.getState());
+					}
+					break;
+				case "last":
+					sh.isStop = false;
+					synchronized (sh) {
+						sh.notifyAll();
+						System.out.println(th.getState());
+					}
+					break;
+				default:
+					break;
 				}
+
 			}
 		};
-		MakeGUI.MakeSearchGUI(listener);
+		sh.gPanel = MakeGUI.MakeSearchGUI(listener);
 		th.start();
 
 	}
 
 	public static void main(String[] args) {
-		Search search = new Search();
 		String[] searchNames = {
 				"Bredth First Search",
 				"Depth  First Search",
@@ -585,7 +663,14 @@ public class Search implements ActionListener {
 				"Hill Climbing Search",
 				"Best First Search",
 				"A star Algorithm" };
-		MakeGUI.MakeChooseSearchGUI(search, searchNames);
+		MakeGUI.MakeChooseSearchGUI(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO 自動生成されたメソッド・スタブ
+				actionByCommand(e.getActionCommand());
+			}
+		}, searchNames);
 
 		/*if (args.length != 1) {
 			System.out.println("USAGE:");
@@ -633,6 +718,38 @@ public class Search implements ActionListener {
 				System.out.println("Please input numbers 1 to 6");
 			}
 		}*/
+	}
+
+	@Override
+	public void run() {
+		switch (type) {
+		case 1:
+			// 幅優先探索
+			breadthFirst();
+			break;
+		case 2:
+			// 深さ優先探索
+			depthFirst();
+			break;
+		case 3:
+			// 分岐限定法
+			branchAndBound();
+			break;
+		case 4:
+			// 山登り法
+			hillClimbing();
+			break;
+		case 5:
+			// 最良優先探索
+			bestFirst();
+			break;
+		case 6:
+			// A*アルゴリズム
+			aStar();
+			break;
+		default:
+			return;
+		}
 	}
 
 }
