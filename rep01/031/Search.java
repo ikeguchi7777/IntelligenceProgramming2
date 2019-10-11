@@ -4,17 +4,27 @@ public class Search {
 	Node[] node;
 	Node goal;
 	Node start;
+	// ノード名
 	String[] locations = { "L.A.Airport", "UCLA", "Hoolywood", "Anaheim", "GrandCanyon", "SanDiego", "Downtown",
 			"Pasadena", "DisneyLand", "Las Vegas" };
+	// 分岐元のインデックス
+	int[] nodeIndex = { 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 6, 7, 7, 8 };
+	// 分岐先のインデックス
+	int[] childIndex = { 1, 2, 2, 6, 3, 6, 7, 4, 7, 8, 8, 9, 1, 5, 7, 8, 9, 9 };
 	int[] nodeRand;
 	int[] costRand;
 
 	Search() {
+		// コストとヒューリスティック関数の決定
 		Random rand = new Random();
 		nodeRand = new int[10];
 		costRand = new int[18];
-		for (int i = 0; i < nodeRand.length; i++)
-			nodeRand[i] = rand.nextInt(9) + 1;
+		for (int i = 0; i < nodeRand.length; i++) {
+			if (i != 0 && i != nodeRand.length - 1)
+				nodeRand[i] = rand.nextInt(9) + 1;
+			else
+				nodeRand[i] = 0;
+		}
 		for (int i = 0; i < costRand.length; i++)
 			costRand[i] = rand.nextInt(9) + 1;
 		makeStateSpace();
@@ -25,24 +35,8 @@ public class Search {
 		Node[] nodelist = new Node[10];
 		for (int i = 0; i < locations.length; i++)
 			nodelist[i] = new Node(locations[i], nodeRand[i]);
-		nodelist[0].addChild(nodelist[1], costRand[0]);
-		nodelist[0].addChild(nodelist[2], costRand[1]);
-		nodelist[1].addChild(nodelist[2], costRand[2]);
-		nodelist[1].addChild(nodelist[6], costRand[3]);
-		nodelist[2].addChild(nodelist[3], costRand[4]);
-		nodelist[2].addChild(nodelist[6], costRand[5]);
-		nodelist[2].addChild(nodelist[7], costRand[6]);
-		nodelist[3].addChild(nodelist[4], costRand[7]);
-		nodelist[3].addChild(nodelist[7], costRand[8]);
-		nodelist[3].addChild(nodelist[8], costRand[9]);
-		nodelist[4].addChild(nodelist[8], costRand[10]);
-		nodelist[4].addChild(nodelist[9], costRand[11]);
-		nodelist[5].addChild(nodelist[1], costRand[12]);
-		nodelist[6].addChild(nodelist[5], costRand[13]);
-		nodelist[6].addChild(nodelist[7], costRand[14]);
-		nodelist[7].addChild(nodelist[8], costRand[15]);
-		nodelist[7].addChild(nodelist[9], costRand[16]);
-		nodelist[8].addChild(nodelist[9], costRand[17]);
+		for (int i = 0; i < nodeIndex.length; i++)
+			nodelist[nodeIndex[i]].addChild(nodelist[childIndex[i]], costRand[i]);
 		node = nodelist.clone();
 		start = node[0];
 		goal = node[9];
@@ -54,6 +48,7 @@ public class Search {
 	public void breadthFirst() {
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
+		start.setGValue(0);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
@@ -83,6 +78,8 @@ public class Search {
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						if (!open.contains(m) && !closed.contains(m)) {
+							int gmn = node.getGValue() + node.getCost(m);
+							m.setGValue(gmn);
 							// m から node へのポインタを付ける．
 							m.setPointer(node);
 							if (m == goal) {
@@ -107,6 +104,7 @@ public class Search {
 	public void depthFirst() {
 		ArrayList<Node> open = new ArrayList<Node>();
 		open.add(start);
+		start.setGValue(0);
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
@@ -141,6 +139,8 @@ public class Search {
 					for (int i = 0; i < children.size(); i++) {
 						Node m = children.get(i);
 						if (!open.contains(m) && !closed.contains(m)) {
+							int gmn = node.getGValue() + node.getCost(m);
+							m.setGValue(gmn);
 							// m から node へのポインタを付ける
 							m.setPointer(node);
 							if (m == goal) {
@@ -248,6 +248,8 @@ public class Search {
 				for (int i = 0; i < children.size(); i++) {
 					Node m = children.get(i);
 					// m から node へのポインタを付ける．
+					int gmn = node.getGValue() + node.getCost(m);
+					m.setGValue(gmn);
 					m.setPointer(node);
 				}
 				// 子節点の中に goal があれば goal を node とする．
@@ -273,6 +275,8 @@ public class Search {
 		if (success) {
 			// System.out.println("*** Solution ***");
 			printSolution(goal, step);
+		} else {
+			System.out.println("faild\nstep:" + step);
 		}
 	}
 
@@ -313,6 +317,8 @@ public class Search {
 						// 子節点mがopenにもclosedにも含まれていなければ，
 						if (!open.contains(m) && !closed.contains(m)) {
 							// m から node へのポインタを付ける．
+							int gmn = node.getGValue() + node.getCost(m);
+							m.setGValue(gmn);
 							m.setPointer(node);
 							open.add(m);
 						}
@@ -421,6 +427,16 @@ public class Search {
 		}
 	}
 
+	// ヒューリスティック関数とエッジのコストを表示
+	public void printCost() {
+		for (int i = 0; i < locations.length; i++)
+			System.out.print(i + "." + locations[i] + "(h:" + nodeRand[i] + "),");
+		System.out.println();
+		for (int i = 0; i < costRand.length; i++) {
+			System.out.print(nodeIndex[i] + "->" + childIndex[i] + "(" + costRand[i] + "),");
+		}
+	}
+
 	/***
 	 * ArrayList を Node の fValue の昇順（小さい順）に列べ換える．
 	 */
@@ -504,6 +520,7 @@ public class Search {
 		 * default: System.out.println("Please input numbers 1 to 6"); } }
 		 */
 		Search place = new Search();
+		place.printCost();
 		System.out.println("Breadth First Search");
 		place.makeStateSpace();
 		place.breadthFirst();
