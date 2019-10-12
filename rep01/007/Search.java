@@ -83,6 +83,7 @@ public class Search implements Runnable {
 			} else {
 				// openの先頭を取り出し node とする．
 				Node node = open.get(0);
+				gPanel.selectTreeNode(node);
 				open.remove(0);
 				// node は ゴールか？
 				if (node == goal) {
@@ -152,6 +153,7 @@ public class Search implements Runnable {
 			} else {
 				// openの先頭を取り出し node とする．
 				Node node = open.get(0);
+				gPanel.selectTreeNode(node);
 				open.remove(0);
 				// node は ゴールか？
 				if (node == goal) {
@@ -228,6 +230,7 @@ public class Search implements Runnable {
 			} else {
 				// openの先頭を取り出し node とする．
 				Node node = open.get(0);
+				gPanel.selectTreeNode(node);
 				open.remove(0);
 				// node は ゴールか？
 				if (node == goal) {
@@ -374,6 +377,7 @@ public class Search implements Runnable {
 			} else {
 				// openの先頭を取り出し node とする．
 				Node node = open.get(0);
+				gPanel.selectTreeNode(node);
 				open.remove(0);
 				// node は ゴールか？
 				if (node == goal) {
@@ -442,6 +446,7 @@ public class Search implements Runnable {
 			} else {
 				// openの先頭を取り出し node とする．
 				Node node = open.get(0);
+				gPanel.selectTreeNode(node);
 				open.remove(0);
 				// node は ゴールか？
 				if (node == goal) {
