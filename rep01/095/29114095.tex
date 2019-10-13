@@ -1,0 +1,152 @@
+\documentclass[a4j]{jarticle}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{listings,jlisting}
+\usepackage{ascmac}
+\usepackage{amsmath,amssymb}
+
+%ここからソースコードの表示に関する設定
+\lstset{
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\smallitshape},
+  keywordstyle={\small\bfseries},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex
+}
+%ここまでソースコードの表示に関する設定
+
+\title{知能プログラミング演習II 課題1}
+\author{グループ07\\
+  29114095 野竹浩二朗\\
+%  {\small (グループレポートの場合は、グループ名および全員の学生番号と氏名が必要)}
+}
+\date{2019年10月7日}
+
+\begin{document}
+\maketitle
+
+\paragraph{提出物} rep1
+\paragraph{グループ} グループ07
+\paragraph{メンバー}
+\begin{tabular}{|c|c|c|}
+  \hline\hline
+  29114007&池口弘尚&\\
+  \hline
+  29114031&大原拓人&\\
+  \hline
+  29114048&北原太一&\\
+  \hline
+  29114086&飛世裕貴&\\
+  \hline
+  29114095&野竹浩二朗&\\
+\end{tabular}
+
+
+
+\section{課題の説明}
+\begin{description}
+\item[課題1-1] Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\item[課題1-2] グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\item[課題1-3] Search.javaの探索過程や最終的に得られた順路をユーザに視覚的に示すGUIを作成せよ．
+\end{description}
+
+\section{課題1-1}
+\begin{screen}
+  Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\end{screen}
+
+\subsection{手法}
+課題で与えられた探索手法は以下のとおりである。
+\begin{enumerate}
+\item 幅優先探索法
+\item 深さ優先探索法
+\item 分枝限定法
+\item 山登り法
+\item 最良優先探索法
+\item A*アルゴリズム
+\end{enumerate}
+
+ある探索手法が上手くいく、もしくは失敗するようにパラメータを調整し、その時他の探索手法がどのような結果となっているのかを確認していく。\\
+私は最良優先探索とA*探索を担当した。
+
+\subsection{実装}
+　プログラムのコード本体は変えず、状態空間のパラメータのみを変化させた。
+
+\subsection{実行例}
+幅優先探索、深さ優先探索については、パラメータを変化させても結果は変わらないため、省略する。また、実行結果すべてを載せてしまうと無駄に長くなってしまうため、STEP数と採取的にどのルートになったかのみを記す。
+
+まず、最良優先が成功する場合として、コスト、評価値を変化させた。
+\begin{table}[h]
+\begin{tabular}{|l|c|l|}
+\hline
+探索手法     & \multicolumn{1}{l|}{STEP数} & 探索結果                                                                                             \\ \hline
+分岐限定法 & 7 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                   \\ \hline
+山登り法 & - & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport \\ \hline
+最良優先探索 & 4 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                 \\ \hline
+A*アルゴリズム & 5 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                 \\ \hline
+\end{tabular}
+\end{table}
+分岐限定法、最良優先探索、A*アルゴリズムが成功していることが分かる。\\
+ステップ数を比較すると、最良優先探索が少なく、分岐限定法が多くなっている。最良優先探索が上手くいくようにパラメータを調整したので、そのステップ数が少なくなることは当然である。\\
+
+次に、A*アルゴリズムが失敗するようにPasadenaの評価値を10とした。
+\begin{table}[ht]
+\begin{tabular}{|l|c|l|}
+\hline
+探索手法 & \multicolumn{1}{l|}{STEP数} & 探索結果                                                                                                                     \\ \hline
+分岐限定法 & 7 & LasVegas \textless{}- DisneyLand\textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport  \\ \hline
+山登り法 & - & \multicolumn{1}{c|}{-}                                                                                                   \\ \hline
+最良優先探索 & 6 & LasVegas \textless{}- GrandCanyon \textless{}- Anaheim \textless{}- Hoolywood \textless{}- L.A.Airport                   \\ \hline
+A*アルゴリズム & 5 & LasVegas \textless{}- GrandCanyon \textless{}- Anaheim \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport \\ \hline
+\end{tabular}
+\end{table}
+分岐限定法は成功しているが、山登り法は無限ループ、最良優先探索とA*アルゴリズムはゴールに到達しているものの、最短のルートではなかった。
+\subsection{考察}
+　最良優先探索の場合、ゴールノードを子ノードに持つノードにたどり着くと、そこからゴールまでのコストに関係なくゴールへと言ってしまう。今回の場合、初期のパラメータだとPasadenaからは一度DisneyLandを経由しなければならないが、最良優先探索ではそれができないので、成功する例として、コストを無理やり減らすということをしなければならなかった。実際は、コストを変えることは難しいため、ヒューリスティックスのみでは不十分であることが分かる。\\
+　A*アルゴリズムは、ヒューリスティックスに加えて、コストも考慮することができるため、最良優先探索では成功できない場合でもしっかりと探索することができる。しかし、ヒューリスティックスに加えて、コストも見なければならないのでステップ数は増えてしまっている。
+
+\section{課題1-2}
+\begin{screen}
+  グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\end{screen}
+
+課題1-2は実装を伴わない課題であるため、考察のみ記す。
+
+\subsection{考察}
+　事務連絡についてはLINEを用いた。ファイルはGitHubを用いて共有した。\\
+ LINEに関しては、ずっと使っているものなので特に不便を感じることは無かった。\\
+ GitHubはファイルの共有するため、初めて使った。まだまだ機能についてあまり分かっていないので少しずつ使いこなせるようにしていきたい。
+
+\section{感想}
+　ほぼ初対面の人とのグループワークに慣れておらず、スムーズに課題を進めることができなかった。2か月という長くない時間だが、グループのみんなと仲良くなりたい。
+
+% 参考文献
+%\begin{thebibliography}{99}
+%\bibitem{kijima2012} 来嶋大二: ひまわりの螺旋, 数学のかんどころシリーズ 8, 共立出版, 2012.
+%\bibitem{notty} ひまわりに隠されたフィボナッチ数列と黄金比---ひまわりは黄金の花？, 数学の面白いこ%と・役に立つことをまとめたサイト, \url{https://analytics-notty.tech/fibonacci-and-goldenratio-in-sunflower/} （2019年10月4日アクセス）.
+
+%\bibitem{hanako} 工大花子さんのレポート。また、・・・を教えてもらった 
+
+%\end{thebibliography}
+
+\end{document}
