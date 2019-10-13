@@ -1,0 +1,162 @@
+\documentclass[a4j]{jarticle}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{listings,jlisting}
+\usepackage{ascmac}
+\usepackage{amsmath,amssymb}
+
+%ここからソースコードの表示に関する設定
+\lstset{
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\smallitshape},
+  keywordstyle={\small\bfseries},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex
+}
+%ここまでソースコードの表示に関する設定
+
+\title{知能プログラミング演習II 課題1}
+\author{グループ07\\
+  29114086 飛世裕貴\\
+%  {\small (グループレポートの場合は、グループ名および全員の学生番号と氏名が必要)}
+}
+\date{2019年10月7日}
+
+\begin{document}
+\maketitle
+
+\paragraph{提出物} rep1
+\paragraph{グループ} グループ07
+\paragraph{メンバー}
+\begin{tabular}{|c|c|c|}
+  \hline\hline
+  学籍番号&名前&貢献度\\
+  \hline\hline
+  29114007&池口弘尚&\\
+  \hline
+  29114031&大原拓人&\\
+  \hline
+  29114048&北原太一&\\
+  \hline
+  29114086&飛世裕貴&\\
+  \hline
+  29114095&野竹浩二朗&\\
+  \hline
+\end{tabular}
+
+
+
+\section{課題の説明}
+\begin{description}
+\item[課題1-1] Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\item[課題1-2] グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\item[課題1-3] Search.javaの探索過程や最終的に得られた順路をユーザに視覚的に示すGUIを作成せよ．
+\end{description}
+
+\section{課題1-1}
+\begin{screen}
+  Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\end{screen}
+
+\subsection{手法}
+課題で与えられた探索手法は以下のとおりである。
+\begin{enumerate}
+\item 幅優先探索法
+\item 深さ優先探索法
+\item 分枝限定法
+\item 山登り法
+\item 最良優先探索法
+\item A*アルゴリズム
+\end{enumerate}
+
+ここではある探索手法に関して探索が成功する、また成功した場合の探索ステップ数がより少なくなるようにパラメータを調整する。この時、各探索手法においてどのような結果が出るのかを確認する。\\
+今回私が担当するのは分枝限定法と山登り法である。
+
+\subsection{実装}
+　今回の課題ではプログラム自体は変えずに、状態空間のパラメータのみを変化させた。
+\subsection{実行例}
+
+まず、パラメータに変更を加える前の各探索手法におけるSTEP数と探索結果を以下に示す。
+\begin{table}[h]
+\begin{tabular}{|l|c|l|}
+\hline
+探索手法     & \multicolumn{1}{l|}{STEP数} & 探索結果                                                                                             \\ \hline
+幅優先探索 & 7 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                   \\ \hline
+深さ優先探索 & 6 & LasVegas \textless{}- Pasadena \textless{}- Downtown \textless{}- UCLA \textless{}- L.A.Airport                   \\ \hline
+分岐限定法 & 8 & LasVegas \textless{}- DisneyLand \textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport                   \\ \hline
+山登り法 & - & 探索失敗 \\ \hline
+最良優先探索 & 6 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                 \\ \hline
+A*アルゴリズム & 8 & LasVegas \textless{}- DisneyLand \textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport                 \\ \hline
+\end{tabular}
+\end{table}
+
+この結果より山登り法において探索が失敗していることがわかる。これはあるノードにおいて次のノードのヒューリスティックスの値のみで探索をしていく山登り法ではUCLA、Downtown、Sandiegoにおいて無限ループが生じるためである。以下では、分枝限定法に関してはSTEP数をより小さく、山登り法に関しては探索が成功するようにパラメータを変更していく。なお、今回のプログラムにおいて幅優先探索と深さ優先探索ではコストやヒューリスティックスの値は考慮しておらず、パラメータの変更が影響を及ぼさないため、記述は省略する。
+
+まず、分枝限定法における探索STEP数を小さくするために、UCLAからDowntownへのコストを11、HoolywoodからAnaheim・Downtownへのコストを10とした。この時の結果を以下に示す。
+
+
+\begin{table}[ht]
+\begin{tabular}{|l|c|l|}
+\hline
+探索手法 & \multicolumn{1}{l|}{STEP数} & 探索結果                                                                                                                     \\ \hline
+分岐限定法 & 6 & LasVegas \textless{}- DisneyLand\textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport  \\ \hline
+山登り法 & - & 探索失敗                                                                                                  \\ \hline
+最良優先探索 & 6 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                   \\ \hline
+A*アルゴリズム & 7 & LasVegas \textless{}- DisneyLand \textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport \\ \hline
+\end{tabular}
+\end{table}
+
+この変更においてA*アルゴリズムが最短経路を発見することは保障されているため、分枝限定法によって最短経路を最小STEP数で探索されていることがわかる。
+
+次に山登り法による探索を成功させるために初期パラメータから、Sandiegoのヒューリスティックスの値を5に変更した。この時の結果を以下に示す。
+
+\begin{table}[ht]
+\begin{tabular}{|l|c|l|}
+\hline
+探索手法 & \multicolumn{1}{l|}{STEP数} & 探索結果                                                                                                                     \\ \hline
+分岐限定法 & 8 & LasVegas \textless{}- DisneyLand \textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport  \\ \hline
+山登り法 & 5 & LasVegas \textless{}- Pasadena \textless{}- Downtown \textless{}- Hoolywood  \textless{}- L.A.Airport  \\ \hline
+最良優先探索 & 5 & LasVegas \textless{}- Pasadena \textless{}- Hoolywood \textless{}- L.A.Airport                   \\ \hline
+A*アルゴリズム & 8 & LasVegas \textless{}- DisneyLand \textless{}- Pasadena \textless{}- Hoolywood \textless{}- UCLA \textless{}- L.A.Airport \\ \hline
+\end{tabular}
+\end{table}
+
+この結果から変更によって山登り法による探索が成功することが確認できた。しかしこの変更においてもA*アルゴリズムが最短経路を発見することは保障されているため、山登り法により最短経路が探索されていないことがわかる。
+\subsection{考察}
+
+本課題において分枝限定法に関して上記のように、変更を行った結果探索STEP数を小さくすることができた。その理由として、初期値においては最短経路には含まれないDowntownへの探索を行っており、変更によってその余分な処理を省くことができたからだと考えられる。
+
+また、分枝限定法と同様にA*アルゴリズムでも最短経路の探索に成功しているが、STEP数に関しては分枝限定法の方が小さくなっている。今回のように経路のパラメータによっては、無駄な処理を省略する分枝限定法の方が探索を早く終えることができる。
+
+そして山登り法に関しては、今回のプログラムにおいて繰り返し回避のための工夫がなされていないため、初期値のように正しくパラメータを設定していなければ無限ループを起こしてしまう。またゴールノードを子ノードに持つノードに到達すると、最もヒューリスティックスの値が小さいノードがゴールノードとなってしまい、ゴールまでのコストに関係なくゴールへ探索を進めてしまう。今回の変更後の探索において、最短経路探索のためにはゴールノードを子ノードに持つPasadenaを経由しなければならないため、正しく最短経路が探索できなかったと考えられる。そのため、今回の経路探索において山登り法により正しい最短経路を求めるにはPasadenaからLasVegasへのコストを小さくする必要があったと考えられる。また今回はプログラム自体への変更を行わずにパラメータを変更することで無限ループに陥ることを防いだが、繰り返し探索を防止することで無限ループを防ぐことができると考える。
+
+\section{課題1-2}
+\begin{screen}
+  グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\end{screen}
+課題1-2は実装を伴わない課題であるため、考察のみ記す。
+\subsection{考察}
+
+\section{感想}
+
+\end{document}
