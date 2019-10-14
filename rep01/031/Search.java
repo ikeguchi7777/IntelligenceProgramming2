@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class Search {
+	static Scanner std = new Scanner(System.in);
 	Node[] node;
 	Node goal;
 	Node start;
@@ -13,7 +14,11 @@ public class Search {
 	int[] childIndex = { 1, 2, 2, 6, 3, 6, 7, 4, 7, 8, 8, 9, 1, 5, 7, 8, 9, 9 };
 	int[] nodeRand;
 	int[] costRand;
-
+	// N回試行の記録(method,0.step 1.cost)
+	int N = 100;
+	int[][] record = new int[6][N];
+	// summary(method,0.less steps 1.minCost)
+	int[][] count;
 	Search() {
 		// コストとヒューリスティック関数の決定
 		Random rand = new Random();
@@ -435,6 +440,7 @@ public class Search {
 		for (int i = 0; i < costRand.length; i++) {
 			System.out.print(nodeIndex[i] + "->" + childIndex[i] + "(" + costRand[i] + "),");
 		}
+		System.out.println();
 	}
 
 	/***
@@ -519,26 +525,28 @@ public class Search {
 		 * System.out.println("\nA star Algorithm"); (new Search()).aStar(); break;
 		 * default: System.out.println("Please input numbers 1 to 6"); } }
 		 */
-		Search place = new Search();
-		place.printCost();
-		System.out.println("Breadth First Search");
-		place.makeStateSpace();
-		place.breadthFirst();
-		System.out.println("Depth First Search");
-		place.makeStateSpace();
-		place.depthFirst();
-		System.out.println("Branch and Bound Search");
-		place.makeStateSpace();
-		place.branchAndBound();
-		System.out.println("Hill Climbing Search");
-		place.makeStateSpace();
-		place.hillClimbing();
-		System.out.println("Best First Search");
-		place.makeStateSpace();
-		place.bestFirst();
-		System.out.println("A star Algorithm");
-		place.makeStateSpace();
-		place.aStar();
+		for(int i=0;i<100;i++) {
+			Search place = new Search();
+			place.printCost();
+			System.out.println("Breadth First Search");
+			place.makeStateSpace();
+			place.breadthFirst();
+			System.out.println("Depth First Search");
+			place.makeStateSpace();
+			place.depthFirst();
+			System.out.println("Branch and Bound Search");
+			place.makeStateSpace();
+			place.branchAndBound();
+			System.out.println("Hill Climbing Search");
+			place.makeStateSpace();
+			place.hillClimbing();
+			System.out.println("Best First Search");
+			place.makeStateSpace();
+			place.bestFirst();
+			System.out.println("A star Algorithm");
+			place.makeStateSpace();
+			place.aStar();
+		}
 	}
 }
 
@@ -616,7 +624,7 @@ class Node {
 			result = result + "(g:" + gValue + ")";
 		}
 		if (hasFValue) {
-			result = result + "(f:" + fValue + ")";
+			//result = result + "(f:" + fValue + ")";
 		}
 		return result;
 	}
