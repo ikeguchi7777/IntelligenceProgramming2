@@ -63,11 +63,15 @@ public class Search implements Runnable {
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
+		long time,start_time,end_time,total;
+		time=0;
+		total=0;
 		for (;;) {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
-			gPanel.ChangeStep(step);
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			if (isStop) {
 				try {
 					wait();
@@ -76,6 +80,7 @@ public class Search implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			start_time=System.currentTimeMillis();
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -115,8 +120,14 @@ public class Search implements Runnable {
 						gPanel.addLeaf(node);
 				}
 			}
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
 		}
 		if (success) {
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			System.out.println("*** Solution ***");
 			printSolution(goal);
 		}
@@ -132,12 +143,15 @@ public class Search implements Runnable {
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
-
+		long time,start_time,end_time,total;
+		time=0;
+		total=0;
 		for (;;) {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
-			gPanel.ChangeStep(step);
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			if (isStop) {
 				try {
 					wait();
@@ -146,6 +160,7 @@ public class Search implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			start_time=System.currentTimeMillis();
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -191,8 +206,14 @@ public class Search implements Runnable {
 						gPanel.addLeaf(node);
 				}
 			}
+			end_time=System.currentTimeMillis();
+			time=end_time-start_time;
 		}
 		if (success) {
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			System.out.println("*** Solution ***");
 			printSolution(goal);
 		}
@@ -209,12 +230,15 @@ public class Search implements Runnable {
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
-
+		long time,start_time,end_time,total;
+		time=0;
+		total=0;
 		for (;;) {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
-			gPanel.ChangeStep(step);
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			if (isStop) {
 				try {
 					wait();
@@ -223,6 +247,7 @@ public class Search implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			start_time=System.currentTimeMillis();
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -274,8 +299,14 @@ public class Search implements Runnable {
 				}
 			}
 			open = sortUpperByGValue(open);
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
 		}
 		if (success) {
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			System.out.println("*** Solution ***");
 			printSolution(goal);
 		}
@@ -293,7 +324,12 @@ public class Search implements Runnable {
 		int step = 0;
 		// Start を node とする．
 		Node node = start;
+		long time,start_time,end_time,total;
+		time=0;
+		total=0;
 		for (;;) {
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			if (isStop) {
 				try {
 					wait();
@@ -302,8 +338,8 @@ public class Search implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			start_time=System.currentTimeMillis();
 			step++;
-			gPanel.ChangeStep(step);
 			gPanel.makeLocalGraph(node);
 			// node は ゴールか？
 			if (node == goal) {
@@ -338,8 +374,14 @@ public class Search implements Runnable {
 					node = min;
 				}
 			}
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
 		}
 		if (success) {
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			System.out.println("*** Solution ***");
 			printSolution(goal);
 		}
@@ -356,12 +398,15 @@ public class Search implements Runnable {
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
-
+		long time,start_time,end_time,total;
+		time=0;
+		total=0;
 		for (;;) {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
-			gPanel.ChangeStep(step);
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			if (isStop) {
 				try {
 					wait();
@@ -370,6 +415,7 @@ public class Search implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			start_time=System.currentTimeMillis();
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -406,8 +452,14 @@ public class Search implements Runnable {
 				}
 			}
 			open = sortUpperByHValue(open);
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
 		}
 		if (success) {
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			System.out.println("*** Solution ***");
 			printSolution(goal);
 		}
@@ -425,12 +477,15 @@ public class Search implements Runnable {
 		ArrayList<Node> closed = new ArrayList<Node>();
 		boolean success = false;
 		int step = 0;
-
+		long time,start_time,end_time,total;
+		time=0;
+		total=0;
 		for (;;) {
 			System.out.println("STEP:" + (step++));
 			System.out.println("OPEN:" + open.toString());
 			System.out.println("CLOSED:" + closed.toString());
-			gPanel.ChangeStep(step);
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			if (isStop) {
 				try {
 					wait();
@@ -439,6 +494,7 @@ public class Search implements Runnable {
 					e.printStackTrace();
 				}
 			}
+			start_time=System.currentTimeMillis();
 			// openは空か？
 			if (open.size() == 0) {
 				success = false;
@@ -505,8 +561,14 @@ public class Search implements Runnable {
 				}
 			}
 			open = sortUpperByFValue(open);
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
 		}
 		if (success) {
+			end_time=System.currentTimeMillis();
+			time=end_time - start_time;
+			total+=time;
+			gPanel.ChangeLabel(step,time,open.size(),closed.size(),total);
 			System.out.println("*** Solution ***");
 			printSolution(goal);
 		}
@@ -639,14 +701,12 @@ public class Search implements Runnable {
 				case "step":
 					synchronized (sh) {
 						sh.notifyAll();
-						System.out.println(th.getState());
 					}
 					break;
 				case "last":
 					sh.isStop = false;
 					synchronized (sh) {
 						sh.notifyAll();
-						System.out.println(th.getState());
 					}
 					break;
 				default:

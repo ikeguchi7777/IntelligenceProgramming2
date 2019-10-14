@@ -22,6 +22,7 @@ import javax.swing.JTree;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 public class MakeGUI {
 
@@ -60,9 +61,25 @@ public class MakeGUI {
 		JPanel p2 = new JPanel();
 		JLabel label1 = new JLabel("Step：");
 		JLabel label2 = new JLabel();
+		JLabel label3 = new JLabel(" Time：");
+		JLabel label4 = new JLabel();
+		JLabel label5 = new JLabel(" OpenSize：");
+		JLabel label6 = new JLabel();
+		JLabel label7 = new JLabel(" CloseSize：");
+		JLabel label8 = new JLabel();
+		JLabel label9 = new JLabel(" TotalTime：");
+		JLabel label10 = new JLabel();
 		p2.add(label1);
 		p2.add(label2);
-		gPanel.SetStepLabel(label2);
+		p2.add(label3);
+		p2.add(label4);
+		p2.add(label5);
+		p2.add(label6);
+		p2.add(label7);
+		p2.add(label8);
+		p2.add(label9);
+		p2.add(label10);
+		gPanel.SetLabels(label2, label4, label6, label8,label10);
 
 		frame.getContentPane().add(p2, BorderLayout.NORTH);
 		frame.getContentPane().add(p, BorderLayout.SOUTH);
@@ -79,7 +96,7 @@ class GraphPanel extends JPanel {
 	private HashMap<String, DefaultMutableTreeNode> nodeMap;
 	private RenderingHints rh;
 	private JTree tree;
-	private JLabel step;
+	private JLabel step, time, open, close,total;
 	String msg = "";
 
 	GraphPanel(int width, int height) {
@@ -98,14 +115,18 @@ class GraphPanel extends JPanel {
 		shapes.clear();
 		this.repaint();
 	}
-	
+
 	public void ShowDialog() {
-		JLabel label = new JLabel("探索したルート:"+msg);
-	    JOptionPane.showMessageDialog(this.getParent(), label);
+		JLabel label = new JLabel("探索したルート:" + msg);
+		JOptionPane.showMessageDialog(this.getParent(), label);
 	}
 
-	public void SetStepLabel(JLabel label) {
-		step = label;
+	public void SetLabels(JLabel step, JLabel time, JLabel open, JLabel close,JLabel total) {
+		this.step = step;
+		this.time = time;
+		this.open = open;
+		this.close = close;
+		this.total = total;
 	}
 
 	public void paintComponent(Graphics g) {
@@ -123,15 +144,15 @@ class GraphPanel extends JPanel {
 	public void makeLocalGraph(Node root) {
 		setLayout(null);
 		removeAll();
-		JLabel rootlab = makeNodeLabel(root,Color.RED, 150, 200);
+		JLabel rootlab = makeNodeLabel(root, Color.RED, 150, 200);
 		int num = root.getChildren().size();
 		if (num == 1) {
-			JLabel child = makeNodeLabel(root.getChildren().get(0),Color.BLUE, 700, 200);
+			JLabel child = makeNodeLabel(root.getChildren().get(0), Color.BLUE, 700, 200);
 			add(child);
 		} else {
-			int t = 400/(num-1);
+			int t = 400 / (num - 1);
 			for (int i = 0; i < num; i++) {
-				JLabel child = makeNodeLabel(root.getChildren().get(i),Color.BLUE, 700, t*i);
+				JLabel child = makeNodeLabel(root.getChildren().get(i), Color.BLUE, 700, t * i);
 				add(child);
 			}
 		}
@@ -140,24 +161,23 @@ class GraphPanel extends JPanel {
 		setVisible(true);
 	}
 
-	public JLabel makeNodeLabel(Node node,Color border, int x, int y) {
+	public JLabel makeNodeLabel(Node node, Color border, int x, int y) {
 		JLabel label = new JLabel(node.toString());
 		label.setBorder(new LineBorder(border, 8, true));
 		label.setHorizontalAlignment(JLabel.CENTER);
 		label.setBounds(x, y, 200, 100);
 		return label;
 	}
-	
-	public void makeArrow(Node p,Node c) {
+
+	public void makeArrow(Node p, Node c) {
 		clear();
 		int num = p.getChildren().size();
 		int i = p.getChildren().indexOf(c);
-		if(num==1) {
+		if (num == 1) {
 			DrawArrow arrow = new DrawArrow(new Point(370, 250), new Point(680, 250));
 			addShape(arrow);
-		}
-		else {
-			DrawArrow arrow = new DrawArrow(new Point(370, 250), new Point(680, 400/(num-1)*i+50));
+		} else {
+			DrawArrow arrow = new DrawArrow(new Point(370, 250), new Point(680, 400 / (num - 1) * i + 50));
 			addShape(arrow);
 		}
 		repaint();
@@ -188,6 +208,11 @@ class GraphPanel extends JPanel {
 		for (int i = 0; i < tree.getRowCount(); i++) {
 			tree.expandRow(i);
 		}
+	}
+
+	public void selectTreeNode(Node node) {
+		DefaultMutableTreeNode p = nodeMap.get(node.name);
+		tree.setSelectionPath(new TreePath(p.getPath()));
 	}
 
 	public void removeNodeFromTree(Node c) {
@@ -225,7 +250,12 @@ class GraphPanel extends JPanel {
 		}
 	}
 
-	public void ChangeStep(int step) {
-		this.step.setText("" + step);
+	public void ChangeLabel(int step,long time,int open,int close,long total) {
+		this.step.setText(String.valueOf(step));
+		this.time.setText(String.valueOf(time)+"ms");
+		this.open.setText(String.valueOf(open));
+		this.close.setText(String.valueOf(close));
+		this.total.setText(String.valueOf(total)+"ms");
+		
 	}
 }

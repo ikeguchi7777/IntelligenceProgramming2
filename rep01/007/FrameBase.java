@@ -14,22 +14,3 @@ class FrameBase extends JFrame{
 	    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
-
-class ThreadTest implements Runnable{
-
-	@Override
-	public void run() {
-		// TODO 自動生成されたメソッド・スタブ
-		test();
-	}
-	
-	synchronized public void test() {
-		try {
-			wait();
-		} catch (InterruptedException e) {
-			// TODO 自動生成された catch ブロック
-			e.printStackTrace();
-		}
-		System.out.println("test");
-	}
-}
