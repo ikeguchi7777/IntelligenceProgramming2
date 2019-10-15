@@ -1,0 +1,290 @@
+\documentclass{jarticle}
+
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{listings,jlisting}
+\usepackage{ascmac}
+\usepackage{amsmath,amssymb}
+
+%ここからソースコードの表示に関する設定
+\lstset{
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\smallitshape},
+  keywordstyle={\small\bfseries},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex
+}
+%ここまでソースコードの表示に関する設定
+
+\title{知能プログラミング演習II 課題1}
+\author{グループ07\\
+  29114031 大原 拓人\\
+%  {\small (グループレポートの場合は、グループ名および全員の学生番号と氏名が必要)}
+}
+\date{2019年10月7日}
+
+\begin{document}
+\maketitle
+
+\paragraph{提出物} rep1 SearchRand.java
+\paragraph{グループ} グループ07
+\paragraph{メンバー}
+\begin{tabular}{|c|c|c|}
+  \hline
+  学生番号&氏名&貢献度比率\\
+  \hline\hline
+  29114007&池口弘尚&100\\
+  \hline
+  29114031&大原拓人&100\\
+  \hline
+  29114048&北原太一&100\\
+  \hline
+  29114086&飛世裕貴&100\\
+  \hline
+  29114095&野竹浩二朗&100\\
+  \hline
+\end{tabular}
+
+\section{課題の説明}
+\begin{description}
+\item[課題1-1] Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\item[課題1-2] グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\item[課題1-3] Search.javaの探索過程や最終的に得られた順路をユーザに視覚的に示すGUIを作成せよ．
+\end{description}
+
+
+\section{課題1-1}
+\begin{screen}
+  Search.javaの状態空間におけるパラメータ（コストや評価値）を様々に変化させて実行し，
+  各探索手法の違いを説明せよ．
+  具体的には，変化させたパラメータと探索結果（最短パス探索の成否，
+  解を返すまでのステップ数，etc.）の関係を，探索手法毎に表やグラフ等にまとめよ．
+  それらの結果を参照して考察を行い，各探索手法の違いを説明せよ．
+\end{screen}
+
+私の担当箇所は、パラメータをランダムに決定し手法ごとの特徴を検証することである。
+\subsection{手法}
+課題で与えられた探索手法と、我々が考察した点は以下のとおりである。
+
+\begin{enumerate}
+\item 幅優先探索法
+\item 深さ優先探索法
+\item 分枝限定法
+\item 山登り法
+\item 最良優先探索法
+\item A*アルゴリズム
+\end{enumerate}
+
+各探索法について、状態空間のパラメータを手動で変更して無限ループに
+陥らせたり、ステップ数の増減を観察した。またパラメータをRandomクラス
+を用いて変動させ試行を繰り返し、最小コストでゴールにたどり着ける手法を
+探した。
+\subsection{実装}
+
+もともと与えられたSearch.javaを以下のように変更した。
+
+\paragraph{}
+状態空間のパラメータをRandomクラスで変動させられるように、
+地点名、ヒューリスティック関数、
+各エッジのコストと、出発元と行先の番号を配列に保存するようにした。
+また、手法ごとに同じパラメータで探索が行えるように、
+保存した配列をもとに状態空間をリセットできるようにした。
+その仕様により、それぞれの状態空間ごとに最小のコストでゴールに
+たどり着ける探索手法とその時のステップ数を比較できるようになった。\\
+
+\paragraph{}
+地点名、ヒューリスティック関数、各エッジのコストと、
+出発元と行先の番号を配列に保存するようにした
+部分と、それをもとに状態空間を生成する部分を
+抜粋したコードは以下のとおりである。
+
+\begin{lstlisting}[caption=SearchRandクラスより抜粋]
+  // ノード名
+	String[] locations = { "L.A.Airport", "UCLA", "Hoolywood", "Anaheim", "GrandCanyon", "SanDiego", "Downtown",
+			"Pasadena", "DisneyLand", "Las Vegas" };
+	// 分岐元のインデックス
+	int[] nodeIndex = { 0, 0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 6, 6, 7, 7, 8 };
+	// 分岐先のインデックス
+	int[] childIndex = { 1, 2, 2, 6, 3, 6, 7, 4, 7, 8, 8, 9, 1, 5, 7, 8, 9, 9 };
+	int[] nodeRand;
+	int[] costRand;
+	int randSize = 99;
+	// N回試行の記録(Method,0.step 1.cost)
+  int[][] record = new int[2][6];
+  public int[][] getRecord() {
+    return record;
+  }
+  SearchRand() {
+    // コストとヒューリスティック関数の決定
+    Random rand = new Random();
+    nodeRand = new int[10];
+    costRand = new int[18];
+    for (int i = 0; i < nodeRand.length; i++) {
+      if (i != 0 && i != nodeRand.length - 1)
+        nodeRand[i] = rand.nextInt(randSize) + 1;
+      else
+        nodeRand[i] = 0;
+    }
+    for (int i = 0; i < costRand.length; i++)
+      costRand[i] = rand.nextInt(randSize) + 1;
+    makeStateSpace();
+  }
+  
+  private void makeStateSpace() {
+    // 状態空間の生成
+    NodeRand[] nodelist = new NodeRand[10];
+    for (int i = 0; i < locations.length; i++)
+      nodelist[i] = new NodeRand(locations[i], nodeRand[i]);
+    for (int i = 0; i < nodeIndex.length; i++)
+      nodelist[nodeIndex[i]].addChild(nodelist[childIndex[i]], costRand[i]);
+    node = nodelist.clone();
+    start = node[0];
+    goal = node[9];
+  }
+\end{lstlisting}
+
+\paragraph{}
+各手法で見つけた経路のコストと、それまでにかかったステップ数を配列に保存し、
+すべての手法の探索が終わった後にその結果を比較する実装は以下のとおりである。
+
+\begin{lstlisting}[caption=結果を保存し、比較]
+	public final int hillClimbing = 3;
+  ...
+  if (success) {
+			// System.out.println("*** Solution ***");
+			// printSolution(goal, step);
+			record[STEP][hillClimbing] = step;
+			record[COST][hillClimbing] = goal.getGValue();
+		} else {
+			//System.out.println("faild\nstep:" + step);
+			record[STEP][hillClimbing] = step;
+			record[COST][hillClimbing] = step * (randSize + 1);
+		}
+  ...
+  // 同じ状態空間で探索を行った後
+  int[][] record = place.getRecord();
+  int minCost = getMin(record[1]);// 6手法中の最小コスト
+  for (int j = 0; j < record[1].length; j++) {
+    if (minCost == record[1][j]) {
+      //最小コストのときカウント
+      counts[1][j]++;
+      //分枝限定法よりA*アルゴリズムのステップ数が多いとき
+      //分枝限定法よりステップ数が少ないか
+      if(record[0][2]<record[0][5]){
+        if(record[0][j]<=record[0][2])
+          counts[0][j]++;
+      }else{
+        //A*アルゴリズムよりステップ数が少ないか
+        if(record[0][j]<=record[0][5])
+          counts[0][j]++;
+        }
+      }
+    }
+  if(record[0][3]==100)hillloop++;
+
+\end{lstlisting}
+
+\subsection{実行例}
+ランダムに状態空間のパラメータを1から9の間で変更した試行を繰り返し、最短経路を
+発見した回数と、より少ないステップ数で最短経路を発見した回数は以下のとおりである。
+入れ替わっているが、counts[0]は後者、counts[1]は前者である。
+山登り法が無限ループに陥った回数もカウントした。
+
+\begin{lstlisting}
+  counts[0][0]:206679,counts[1][0]:471074
+  counts[0][1]:110876,counts[1][1]:122587
+  counts[0][2]:203326,counts[1][2]:1000000
+  counts[0][3]:106402,counts[1][3]:106436
+  counts[0][4]:213036,counts[1][4]:251926
+  counts[0][5]:802176,counts[1][5]:848311
+  hillloop:298951
+  counts[0][0]:207610,counts[1][0]:471056
+  counts[0][1]:111085,counts[1][1]:122867
+  counts[0][2]:202782,counts[1][2]:1000000
+  counts[0][3]:106586,counts[1][3]:106610
+  counts[0][4]:213300,counts[1][4]:251970
+  counts[0][5]:803118,counts[1][5]:848982
+  hillloop:298163
+\end{lstlisting}
+
+ランダムに状態空間のパラメータを1から99の間で変更した場合は以下のようになった。
+
+\begin{lstlisting}
+  counts[0][0]:13493,counts[1][0]:37236
+  counts[0][1]:8747,counts[1][1]:10424
+  counts[0][2]:27577,counts[1][2]:100000
+  counts[0][3]:10212,counts[1][3]:10215
+  counts[0][4]:16967,counts[1][4]:20453
+  counts[0][5]:69439,counts[1][5]:77482
+  hillloop:28461
+  counts[0][0]:13318,counts[1][0]:36973
+  counts[0][1]:8827,counts[1][1]:10537
+  counts[0][2]:27631,counts[1][2]:100000
+  counts[0][3]:10231,counts[1][3]:10235
+  counts[0][4]:17010,counts[1][4]:20508
+  counts[0][5]:69210,counts[1][5]:77383
+  hillloop:28604
+\end{lstlisting}
+
+分枝限定法が必ず最短経路を見つけていることがわかる。
+
+\subsection{考察}
+\paragraph{}
+A*アルゴリズムは必ず最短経路を発見できると勘違いしていたが、
+ヒューリスティック関数が影響して最短経路ではない経路を発見して
+終了する場合があることがわかった。
+もともと、状態空間のノードのつなぎ方は変動していないので
+条件としてはかなり限定されているが、A*アルゴリズムが最短経路を
+発見したときは分枝限定法より少ないステップ数で発見できている。
+また、山登り法が無限ループに陥る確率もある程度収束しているように思われる。
+\paragraph{}
+手動で状態空間のパラメータを変更した際の考察については、
+グループレポートを参考にされたい。
+
+\section{課題1-2}
+\begin{screen}
+  グループでの進捗管理や成果物共有などについて，工夫した点や使ったツールについて考察せよ．
+\end{screen}
+
+課題1-2は実装を伴わない課題であるため、考察のみ記す。
+
+\subsection{考察}
+  今回は課題の分量が少なかったので、演習時間内に終わらなかった分は
+  後日全員で集まって課題を進めた。
+  連絡手段としてLINEを用いた。今後の予定としては、
+  GitHubを用いて進捗状況の共有をできるようにしたい。
+
+\section{課題1-3}
+\begin{screen}
+  Search.javaの探索過程や最終的に得られた順路をユーザに視覚的に示すGUIを作成せよ．
+\end{screen}
+この部分は担当していないので、グループレポートを参考にされたい。
+
+\section{感想}
+自分にとって、締め切りギリギリを攻めるのはいつものことであるが、
+グループワークとなると甚だ迷惑なので、
+しっかり時間をとって早めに済ませるようにしたい。グループ間の
+コミュニケーションについては、うまくアイスブレイク活動を行ったので
+話しやすい関係を築けた。
+
+% 参考文献
+\begin{thebibliography}{99}
+\bibitem{text} 知能処理学の講義スライド、主に分枝限定法の部分
+\end{thebibliography}
+
+\end{document}
