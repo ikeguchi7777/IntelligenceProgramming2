@@ -112,7 +112,7 @@
 
 \end{itemize}
 
-n番目のフィボナッチ数を計算するcalcFiboメソッドの実装をソースコードに示す。
+BadNodeクラスの実装を以下に示す。
 \begin{lstlisting}[caption=BadNodeクラス,label=src:BadNode]
     //無限ループを形成するノード
     class BadNode extends Node {
@@ -130,105 +130,135 @@ n番目のフィボナッチ数を計算するcalcFiboメソッドの実装を�
     }
 \end{lstlisting}
 
-isFiboメソッドおよびcalcFiboSeqの実装については、グループレポートを参考にされたい。
-
-calcFiboメソッドに渡す引数nをプログラム実行時に指定できるようにするため、mainメソッドおよびFibonacciクラスのコンストラクタを以下のように実装した。
-\begin{lstlisting}[caption=mainメソッドとコンストラクタ,label=src:main]
-    public static void main(String[] args) {
-	new Fibonacci(Integer.parseInt(args[0]));
-    }
-
-    public Fibonacci(int n) {
-	System.out.println(calcFibo(n));
-    }
-\end{lstlisting}
-
 \subsubsection{深さ優先探索}
 深さ優先探索をするdepthFirstメソッドを、以下のように改良した。
 \begin{lstlisting}[caption=depthFirstメソッド,label=src:depthFirst]
-	/***
-	 * 反復深化深さ優先探索
-	 */
-	public void depthFirst() {
-		ArrayList<Node> open = new ArrayList<Node>();
-		open.add(start);
-		ArrayList<Node> newOpen = new ArrayList<>(); //深さが1レベル深いオープンリスト
-		ArrayList<Node> closed = new ArrayList<Node>();
-		boolean success = false;
-		int step = 0;
+    /***
+     * 反復深化深さ優先探索
+     */
+    public void depthFirst() {
+        ArrayList<Node> open = new ArrayList<Node>();
+        open.add(start);
+        ArrayList<Node> newOpen = new ArrayList<>(); //深さが1レベル深いオープンリスト
+        ArrayList<Node> closed = new ArrayList<Node>();
+        boolean success = false;
+        int step = 0;
 
-		for (;;) {
-			System.out.println("STEP:" + (step++));
-			System.out.println("OPEN:" + open.toString());
-			System.out.println("NEWOPEN:" + newOpen.toString());
-			System.out.println("CLOSED:" + closed.toString());
-			// openは空か？
-			if (open.size() == 0) {
-            	//newOpenも空か?
-				if (newOpen.size() == 0) {
-					success = false;
-					break;
-				}
+        for (;;) {
+            System.out.println("STEP:" + (step++));
+            System.out.println("OPEN:" + open.toString());
+            System.out.println("NEWOPEN:" + newOpen.toString());
+            System.out.println("CLOSED:" + closed.toString());
+            // openは空か？
+            if (open.size() == 0) {
+                //newOpenも空か?
+                if (newOpen.size() == 0) {
+                    success = false;
+                    break;
+                }
                 //探索を1レベル深くし、newOpenをリセット
-				open = newOpen;
-				newOpen = new ArrayList<>();
-			} else {
-				// openの先頭を取り出し node とする．
-				Node node = open.get(0);
-				open.remove(0);
-				// node は ゴールか？
-				if (node == goal) {
-					success = true;
-					break;
-				} else {
-					// node を展開して子節点をすべて求める．
-					ArrayList<Node> children = node.getChildren();
-					// node を closed に入れる．
-					closed.add(node);
-					// 子節点 m が open にも newOpen にも closed にも含まれていなければ，
-					// 以下を実行．幅優先探索と異なるのはこの部分である．
-					// j は複数の子節点を適切にnewOpenの先頭に置くために位置
-					// を調整する変数であり，一般には展開したときの子節点
-					// の位置は任意でかまわない．
-					int j = 0;
-					for (int i = 0; i < children.size(); i++) {
-						Node m = children.get(i);
-						if (!open.contains(m) && !newOpen.contains(m) && !closed.contains(m)) {
-							// m から node へのポインタを付ける
-							m.setPointer(node);
+                open = newOpen;
+                newOpen = new ArrayList<>();
+            } else {
+                // openの先頭を取り出し node とする．
+                Node node = open.get(0);
+                open.remove(0);
+                // node は ゴールか？
+                if (node == goal) {
+                    success = true;
+                    break;
+                } else {
+                    // node を展開して子節点をすべて求める．
+                    ArrayList<Node> children = node.getChildren();
+                    // node を closed に入れる．
+                    closed.add(node);
+                    // 子節点 m が open にも newOpen にも closed にも含まれていなければ，
+                    // 以下を実行．幅優先探索と異なるのはこの部分である．
+                    // j は複数の子節点を適切にnewOpenの先頭に置くために位置
+                    // を調整する変数であり，一般には展開したときの子節点
+                    // の位置は任意でかまわない．
+                    int j = 0;
+                    for (int i = 0; i < children.size(); i++) {
+                        Node m = children.get(i);
+                        if (!open.contains(m) && !newOpen.contains(m) && !closed.contains(m)) {
+                            // m から node へのポインタを付ける
+                            m.setPointer(node);
                             //newOpenに追加
-							if (m == goal) {
-								newOpen.add(0, m);
-							} else {
-								newOpen.add(j, m);
-							}
-							j++;
-						}
-					}
-				}
-			}
-		}
-		if (success) {
-			System.out.println("*** Solution ***");
-			printSolution(goal);
-		}
-	}
+                            if (m == goal) {
+                                newOpen.add(0, m);
+                            } else {
+                                newOpen.add(j, m);
+                            }
+                            j++;
+                        }
+                    }
+                }
+            }
+        }
+        if (success) {
+            System.out.println("*** Solution ***");
+            printSolution(goal);
+        }
+    }
 
 \end{lstlisting}
 
 \subsection{実行例}
-Fibonacciクラスに引数5を指定した実行結果を以下に示す。
+BadNodeを用いた状態空間に対し、深さ優先探索、反復深化深さ優先探索、山登り法を実行した結果を以下に示す。
 
-\begin{lstlisting}
-clf1XXXX@cse:~/eclipse-workspace/Fibo > java Fibonacci 5
-8
+\begin{lstlisting}[caption=深さ優先探索]
+(前略)
+STEP:848
+OPEN:[Bad846(h:1), Good(h:3)]
+CLOSED:[Start(h:0), Bad(h:1), Bad0(h:1), Bad1(h:1), Bad2(h:1), (中略), Bad843(h:1), Bad844(h:1), Bad845(h:1)]
+STEP:849
+OPEN:[Bad847(h:1), Good(h:3)]
+CLOSED:[Start(h:0), Bad(h:1), Bad0(h:1), Bad1(h:1), Bad2(h:1), (中略), Bad844(h:1), Bad845(h:1), Bad846(h:1)]
+STEP:850
+(以下略)
 \end{lstlisting}
 
-今回は0, 1番目のフィボナッチ数を1としたため、calcFibo() の引数に5を与えた時は8となるのが正しい動作である。これは、・・・
-\subsection{考察}
-今回、フィボナッチ数をもとめるためのクラス Fibonacci を実装し、インスタンスメソッドとして機能を実装したが、これは静的クラスまたはシングルトンとして実装した方が適していたように考えられる。なぜなら・・・
+\begin{lstlisting}[caption=反復深化深さ優先探索]
+Depth First Search
+STEP:0
+OPEN:[Start(h:0)]
+NEWOPEN:[]
+CLOSED:[]
+STEP:1
+OPEN:[]
+NEWOPEN:[Bad(h:1), Good(h:3)]
+CLOSED:[Start(h:0)]
+STEP:2
+OPEN:[Bad(h:1), Good(h:3)]
+NEWOPEN:[]
+CLOSED:[Start(h:0)]
+STEP:3
+OPEN:[Good(h:3)]
+NEWOPEN:[Bad0(h:1)]
+CLOSED:[Start(h:0), Bad(h:1)]
+STEP:4
+OPEN:[]
+NEWOPEN:[Goal(h:0), Bad0(h:1)]
+CLOSED:[Start(h:0), Bad(h:1), Good(h:3)]
+STEP:5
+OPEN:[Goal(h:0), Bad0(h:1)]
+NEWOPEN:[]
+CLOSED:[Start(h:0), Bad(h:1), Good(h:3)]
+*** Solution ***
+Goal(h:0) <- Good(h:3) <- Start(h:0)
+\end{lstlisting}
 
-また、calcFiboメソッドを再帰関数として実装するのではなく、イテレータを用いて実装した場合を考える。イテレータで実装した場合は、実行速度が・・・
+\begin{lstlisting}[caption=山登り法]
+(前略)
+[Bad199906(h:1)]
+[Bad199907(h:1)]
+[Bad199908(h:1)]
+[Bad199909(h:1)]
+(以下略)
+\end{lstlisting}
+
+\subsection{考察}
+深さ優先探索、山登り法の場合、解(Goal)のほうに進むGoodノードには進まず、解が存在しないがヒューリスティクス関数がより良いBadノードに進んでしまう。しかしながら、反復進化深さ優先探索により、探索するノードの深さを制限することにより、深さ優先探索で探索できない状態空間でも解を求めることができる。
 
 
 \section{課題1-2}
@@ -239,39 +269,8 @@ clf1XXXX@cse:~/eclipse-workspace/Fibo > java Fibonacci 5
 課題1-2は実装を伴わない課題であるため、考察のみ記す。
 
 \subsection{考察}
-  今回は課題の分量が少なかったので、演習時間内に終わらなかった分は後日全員で集まって課題を進めた。
-  連絡手段としてLINEを用いた。今後の予定としては、
-%文献\cite{kijima2012}によると、ひまわりの種の並び方にフィボナッチ数列が隠れているという。具体的には、・・・。その原理は、・・・であると考えられる。何故なら、%図\ref{fig:himawari} \cite{notty} に示すように、・・・
+  演習時間内に終わらなかった分は後日全員で集まって課題を進めた。
+  連絡手段としてLINEを、ファイル管理にGitHubを用いた。
 
-%\begin{figure}[!hbt]
-%  \centering
-%  \includegraphics[bb=0 0 543 245,width=0.6\linewidth]{himawari.png}
-%  \caption{ひまわりの種の並び方\cite{notty}}
-%  \label{fig:himawari}
-%\end{figure}
-
-\section{課題1-3}
-\begin{screen}
-  Search.javaの探索過程や最終的に得られた順路をユーザに視覚的に示すGUIを作成せよ．
-\end{screen}
-
-\subsection{実装}
-
-\subsection{実行例}
-
-\subsection{考察}
-
-\section{感想}
-フィボナッチ数の一般項をもとめるのに夢中であやうく実装が間に合わなくなるところだった。実装に関しては、・・・
-
-
-% 参考文献
-\begin{thebibliography}{99}
-%\bibitem{kijima2012} 来嶋大二: ひまわりの螺旋, 数学のかんどころシリーズ 8, 共立出版, 2012.
-%\bibitem{notty} ひまわりに隠されたフィボナッチ数列と黄金比---ひまわりは黄金の花？, 数学の面白いこと・役に立つことをまとめたサイト, \url{https://analytics-notty.tech/fibonacci-and-goldenratio-in-sunflower/} （2019年10月4日アクセス）.
-
-\bibitem{hanako} 工大花子さんのレポート。また、・・・を教えてもらった 
-
-\end{thebibliography}
 
 \end{document}
